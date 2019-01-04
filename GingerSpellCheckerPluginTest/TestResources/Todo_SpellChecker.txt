@@ -1,0 +1,4 @@
+spell check no
+
+level word sentence
+
