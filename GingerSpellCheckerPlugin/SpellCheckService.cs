@@ -38,14 +38,14 @@ namespace GingerSpellCheckerPlugin
             GA.AddOutput("Correct", textBoxes.Count - incorrectCount);
             foreach (TextBox textBox in textBoxes)
             {
-                string spelling = "Correct Spelling";
+                string spelling = "Correct Spelling.";
                 if (!textBox.isCorrectSpelling)
                 {
                     spelling = "Incorrect Spelling. Suggestion: " + textBox.suggestion;
                 }
                 string position = "Position: (" + textBox.xPosition + "," + textBox.yPosition + ")";
                 string size = "Width: " + textBox.width + "Height: " + textBox.height;
-                GA.AddOutput("Word " + i + ": " + textBox.text, spelling, position + " " + size);
+                GA.AddOutput(textBox.text, spelling, position + " " + size);
                 i++;
             }
             // EX: GA.AddOutput("Hello", "OK", "1");
