@@ -1,0 +1,8 @@
+﻿{
+  "Id": "SpellCheck",
+  "Version": "1.0.0 Beta",
+  "ProjectUrl": "https://github.com/Ginger-Automation/Ginger-SpellCheck-Plugin",
+  "Description": "Spell Check for image and text",
+  "Summary": "SpellCheck Integration For Ginger",
+  "StartupDLL": "GingerSpellCheckPlugin.dll"
+}
