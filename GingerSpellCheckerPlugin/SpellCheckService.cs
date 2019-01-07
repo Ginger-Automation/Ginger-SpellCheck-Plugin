@@ -20,11 +20,14 @@ namespace GingerSpellCheckerPlugin
                 GA.AddError("Could not find the file: '" + fileName + "'");
                 return;
             }
+
             //Act
             // Do spell check
             BitmapScanner bitmapScanner = new BitmapScanner();
             int incorrectCount;
             List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+            GA.AddError("The file '" + fileName + "' is not an image");
+
             //Out
             // add ALL words, param is the word, path is the index, for each word found, value = OK/NOK(bad spell)
             if (textBoxes.Count == 0)
@@ -32,7 +35,6 @@ namespace GingerSpellCheckerPlugin
                 GA.AddExInfo("Could not find any text");
                 return;
             }
-            int i = 0;
             GA.AddOutput("Total Words", textBoxes.Count);
             GA.AddOutput("Incorrect", incorrectCount);
             GA.AddOutput("Correct", textBoxes.Count - incorrectCount);
@@ -46,17 +48,32 @@ namespace GingerSpellCheckerPlugin
                 string position = "Position: (" + textBox.xPosition + "," + textBox.yPosition + ")";
                 string size = "Width: " + textBox.width + "Height: " + textBox.height;
                 GA.AddOutput(textBox.text, spelling, position + " " + size);
-                i++;
             }
-            // EX: GA.AddOutput("Hello", "OK", "1");
-            //   GA.AddOutput("jokmlopo", "NOK", "2");
-            // output also bitmap width, height, dpi and anything interesting
-            // GA.AddExInfo("KooKoo");   // write ex info on the bitmap
         }
 
         [GingerAction("SpellCheckText", "Spell check a text")]
-        public void SpellCheckTxt(IGingerAction GA, string text)
+        public void SpellCheckText(IGingerAction GA, string text)
         {
+            //In
+            // Check if text is empty
+            if (text == "")
+            {
+                GA.AddExInfo("Recieved empty string");
+            }
+
+            //Act
+            //Do Spell Check
+            string spelling = "Correct Spelling.";
+            SpellCheck spellChecker = new SpellCheck();
+            string sugg = "";
+            if (spellChecker.Check(text, out sugg))
+            {
+                spelling = "Incorrect Spelling. Suggestion: " + sugg;
+            }
+
+            //Out
+            // Add if correct or not and the suggestion
+            GA.AddOutput(text, spelling, "");
         }
     }
 }

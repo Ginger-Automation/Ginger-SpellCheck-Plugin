@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Tesseract;
 
 namespace GingerSpellCheckerPlugin
@@ -8,9 +9,9 @@ namespace GingerSpellCheckerPlugin
         public List<TextBox> getTextBoxes(string filePath, bool checkSpelling, out int incorrectCounter)
         {
             List<TextBox> textBoxes = new List<TextBox>();
+            incorrectCounter = 0;
             Pix img = Pix.LoadFromFile(filePath);
             TesseractEngine Engine = new TesseractEngine(@"./tessdata", "eng");
-            incorrectCounter = 0;
             PageIteratorLevel myLevel = PageIteratorLevel.Word;
             using (Page page = Engine.Process(img))
             {
