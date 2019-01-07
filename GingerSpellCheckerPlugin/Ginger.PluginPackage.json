@@ -4,5 +4,5 @@
   "ProjectUrl": "https://github.com/Ginger-Automation/Ginger-SpellCheck-Plugin",
   "Description": "Spell Check for image and text",
   "Summary": "SpellCheck Integration For Ginger",
-  "StartupDLL": "GingerSpellCheckPlugin.dll"
+  "StartupDLL": "GingerSpellCheckerPlugin.dll"
 }

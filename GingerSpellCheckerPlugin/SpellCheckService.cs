@@ -9,7 +9,7 @@ namespace GingerSpellCheckerPlugin
     [GingerService("SpellCheckService", "Spell Check service")]
     public class SpellCheckService
     {
-        [GingerAction("SpellCheck", "Spell check a bitmap")]
+        [GingerAction("SpellCheckBitmap", "Spell check a bitmap")]
         public void SpellCheckWord(IGingerAction GA, string fileName)
         {
             Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
@@ -54,7 +54,7 @@ namespace GingerSpellCheckerPlugin
             // GA.AddExInfo("KooKoo");   // write ex info on the bitmap
         }
 
-        [GingerAction("SpellCheck", "Spell check a bitmap")]
+        [GingerAction("SpellCheckText", "Spell check a text")]
         public void SpellCheckTxt(IGingerAction GA, string text)
         {
         }

@@ -1,0 +1,31 @@
+[
+  {
+    "ServiceId": "SpellCheckService",
+    "Description": null,
+    "IsSession": false,
+    "Actions": [
+      {
+        "ActionId": "SpellCheckBitmap",
+        "Description": "Spell check a bitmap",
+        "Interface": null,
+        "InputValues": [
+          {
+            "Param": "fileName",
+            "ParamTypeName": "string"
+          }
+        ]
+      },
+      {
+        "ActionId": "SpellCheckText",
+        "Description": "Spell check a bitmap",
+        "Interface": null,
+        "InputValues": [
+          {
+            "Param": "text",
+            "ParamTypeName": "string"
+          }
+        ]
+      }
+    ]
+  }
+]

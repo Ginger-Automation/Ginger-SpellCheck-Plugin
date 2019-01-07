@@ -33,6 +33,9 @@
     <None Update="TestResources\BigBog.tif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestResources\TestGreenBackg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestResources\TestWhite.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

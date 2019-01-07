@@ -3,6 +3,7 @@ using GingerSpellCheckerPlugin;
 using GingerTestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GingerSpellCheckerPluginTest
 {
@@ -98,6 +99,23 @@ namespace GingerSpellCheckerPluginTest
             // Assert
 
             Assert.AreEqual("Could not find any text", GA.ExInfo, "Could not find any text = GA.ExInfo");
+        }
+
+        [TestMethod]
+        public void TestGreenSpell()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA = new GingerAction();
+            string filename = TestResources.GetTestResourcesFile("TestGreenBackg.png");
+
+            // Act
+            spellCheckService.SpellCheckWord(GA, filename);
+            int Incorrect = (from x in GA.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            Assert.AreEqual(null, GA.Errors, "Errors=null");            
+            Assert.AreNotEqual("0", Incorrect, "0 = Incorrect");
         }
     }
 }
