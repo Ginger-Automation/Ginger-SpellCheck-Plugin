@@ -97,8 +97,7 @@ namespace GingerSpellCheckerPluginTest
             spellCheckService.SpellCheckWord(GA, filename);
 
             // Assert
-
-            Assert.AreEqual("Could not find any text", GA.ExInfo, "Could not find any text = GA.ExInfo");
+            Assert.AreNotEqual(null, GA.Errors, "Could not find any text = GA.ExInfo");
         }
 
         [TestMethod]

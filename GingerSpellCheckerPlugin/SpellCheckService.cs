@@ -26,7 +26,14 @@ namespace GingerSpellCheckerPlugin
             // Do spell check
             BitmapScanner bitmapScanner = new BitmapScanner();
             int incorrectCount;
-            List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+            try
+            {
+                List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+            } catch (Exception ex)
+            {
+                GA.AddError("Error while processing bitmap: " + ex.Message);
+            }
+            
 
             //Out
             // add ALL words, param is the word, path is the index, for each word found, value = OK/NOK(bad spell)
