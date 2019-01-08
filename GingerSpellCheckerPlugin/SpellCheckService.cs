@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GingerSpellCheckerPlugin
 {
@@ -26,7 +27,6 @@ namespace GingerSpellCheckerPlugin
             BitmapScanner bitmapScanner = new BitmapScanner();
             int incorrectCount;
             List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
-            GA.AddError("The file '" + fileName + "' is not an image");
 
             //Out
             // add ALL words, param is the word, path is the index, for each word found, value = OK/NOK(bad spell)
@@ -54,6 +54,7 @@ namespace GingerSpellCheckerPlugin
         [GingerAction("SpellCheckText", "Spell check a text")]
         public void SpellCheckText(IGingerAction GA, string text)
         {
+            Console.WriteLine(DateTime.Now + "> Text: " + text);
             //In
             // Check if text is empty
             if (text == "")
@@ -63,17 +64,76 @@ namespace GingerSpellCheckerPlugin
 
             //Act
             //Do Spell Check
-            string spelling = "Correct Spelling.";
             SpellCheck spellChecker = new SpellCheck();
             string sugg = "";
-            if (spellChecker.Check(text, out sugg))
-            {
-                spelling = "Incorrect Spelling. Suggestion: " + sugg;
-            }
-
+            char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' };
+            string[] words = text.ToLower().Split(seperators);
+            int incorrect = 0;
+            int correct = 0;
             //Out
             // Add if correct or not and the suggestion
-            GA.AddOutput(text, spelling, "");
+            foreach (string word in words)
+            {
+                if (word == "")
+                {
+                    continue;
+                }
+                string spelling = "Correct Spelling.";
+                if (!spellChecker.Check(word, out sugg))
+                {
+                    spelling = "Incorrect Spelling. Suggestion: " + sugg;
+                    incorrect++;
+                } else
+                {
+                    correct++;
+                }
+                GA.AddOutput(text, spelling, "");
+            }
+            GA.AddOutput("Incorrect", incorrect, "");
+            GA.AddOutput("Correct", correct, "");
+        }
+
+        [GingerAction("SpellCheckReturnImage", "Spell check an Image and get an Image with marks on the mispelling")]
+        public void SpellCheckImage2 (IGingerAction GA, string fileName)
+        {
+            Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
+            //In
+            // Check file exist if not set proper message in GA.Error and return
+            if (!File.Exists(fileName))
+            {
+                GA.AddError("Could not find the file: '" + fileName + "'");
+                return;
+            }
+
+            //Act
+            // Do spell check
+            BitmapScanner bitmapScanner = new BitmapScanner();
+            int incorrectCount;
+            List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+
+            // Create the Image with markers
+            
+        }
+
+        [GingerAction("SpellCheckFolder", "Spell check all the images in a folder")]
+        public void SpellCheckFolder(IGingerAction GA, string folderName)
+        {
+            Console.WriteLine(DateTime.Now + "> Filename: " + folderName);
+            //In
+            //get all the files in the folder
+            string[] files = Directory.GetFiles(folderName, "*ProfileHandler.cs", SearchOption.TopDirectoryOnly);
+
+            //Act and Out
+            //loop over files and run spellcheckword
+            if (files.Length == 0)
+            {
+                GA.AddError("There are no files in the folder: '" + folderName + "'.");
+                return;
+            }
+            foreach (string file in files)
+            {
+                SpellCheckWord(GA, file);
+            }
         }
     }
 }
