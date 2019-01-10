@@ -97,7 +97,7 @@ namespace GingerSpellCheckerPluginTest
             spellCheckService.SpellCheckWord(GA, filename);
 
             // Assert
-            Assert.AreNotEqual(null, GA.Errors, "Could not find any text = GA.ExInfo");
+            Assert.AreNotEqual(null, GA.Errors, "null != GA.Errors");
         }
 
         [TestMethod]
@@ -118,54 +118,121 @@ namespace GingerSpellCheckerPluginTest
         }
 
         [TestMethod]
-        public void TestSpellCheckText()
+        public void TestSpellCheckTextAllCorrect()
         {
             //Arrange
             SpellCheckService spellCheckService = new SpellCheckService();
             GingerAction GA1 = new GingerAction();
-            GingerAction GA2 = new GingerAction();
-            GingerAction GA3 = new GingerAction();
-            GingerAction GA4 = new GingerAction();
-            GingerAction GA5 = new GingerAction();
             string textCorrect = "Everything here is spelled correctly";
-            string textCorrect2 = "EvEryThInG hErE Is sPeLlEd cOrReCtLy ToO";
-            string textIncorrect = "Evirytheng hir ees spelld encorrictly";
-            string textIncorrect2 = "EviryThenG hir ees sPeLld encOrRiCtLy Tuu";
-            string mixed = "Right rong nutright rIgHt comma,should, be ,right";
 
             // Act
             spellCheckService.SpellCheckText(GA1, textCorrect);
-            spellCheckService.SpellCheckText(GA2, textCorrect2);
-            spellCheckService.SpellCheckText(GA3, textIncorrect);
-            spellCheckService.SpellCheckText(GA4, textIncorrect2);
-            spellCheckService.SpellCheckText(GA5, mixed);
             int IncorrectGA1 = (from x in GA1.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int IncorrectGA2 = (from x in GA2.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int IncorrectGA3 = (from x in GA3.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int IncorrectGA4 = (from x in GA4.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int IncorrectGA5 = (from x in GA5.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
             int CorrectGA1 = (from x in GA1.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
-            int CorrectGA2 = (from x in GA2.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
-            int CorrectGA3 = (from x in GA3.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
-            int CorrectGA4 = (from x in GA4.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
-            int CorrectGA5 = (from x in GA5.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
 
             // Assert
             Assert.AreEqual(null, GA1.Errors, "Errors=null");
-            Assert.AreEqual(null, GA2.Errors, "Errors=null");
-            Assert.AreEqual(null, GA3.Errors, "Errors=null");
-            Assert.AreEqual(null, GA4.Errors, "Errors=null");
-            Assert.AreEqual(null, GA5.Errors, "Errors=null");
             Assert.AreEqual(0, IncorrectGA1, "0 = Incorrect");
-            Assert.AreEqual(0, IncorrectGA2, "0 = Incorrect2");
-            Assert.AreEqual(5, IncorrectGA3, "5 = Incorrect1");
-            Assert.AreEqual(6, IncorrectGA4, "6 = Incorrect22");
-            Assert.AreEqual(2, IncorrectGA5, "2 = IncorrectMixed");
             Assert.AreEqual(5, CorrectGA1, "5 = Correct");
+        }
+
+        [TestMethod]
+        public void TestSpellCheckTextAllCorrectUpperLowerMix()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA2 = new GingerAction();
+            string textCorrect2 = "EvEryThInG hErE Is sPeLlEd cOrReCtLy ToO";
+
+            // Act
+            spellCheckService.SpellCheckText(GA2, textCorrect2);
+            int IncorrectGA2 = (from x in GA2.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectGA2 = (from x in GA2.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            Assert.AreEqual(null, GA2.Errors, "Errors=null");
+            Assert.AreEqual(0, IncorrectGA2, "0 = Incorrect2");
             Assert.AreEqual(6, CorrectGA2, "6 = Correct2");
-            Assert.AreEqual(0, CorrectGA3, "0 = Correct1");
+        }
+
+        [TestMethod]
+        public void TestSpellCheckTextAllIncorrect()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA3 = new GingerAction();            
+            string textIncorrect = "Evirytheng hir ees spelld encorrictly";           
+
+            // Act
+            spellCheckService.SpellCheckText(GA3, textIncorrect);            
+            int IncorrectGA3 = (from x in GA3.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();           
+            int CorrectGA3 = (from x in GA3.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();            
+
+            // Assert            
+            Assert.AreEqual(null, GA3.Errors, "Errors=null");               
+            Assert.AreEqual(5, IncorrectGA3, "5 = Incorrect1");
+            Assert.AreEqual(0, CorrectGA3, "0 = Correct1");           
+        }
+
+        [TestMethod]
+        public void TestSpellCheckTextAllIncorrectUpperLowerMix()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();            
+            GingerAction GA4 = new GingerAction();
+            string textIncorrect2 = "EviryThenG hir ees sPeLld encOrRiCtLy Tuu";
+
+            // Act            
+            spellCheckService.SpellCheckText(GA4, textIncorrect2);
+            int IncorrectGA4 = (from x in GA4.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectGA4 = (from x in GA4.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            Assert.AreEqual(null, GA4.Errors, "Errors=null");
+            Assert.AreEqual(6, IncorrectGA4, "6 = Incorrect22");
             Assert.AreEqual(0, CorrectGA4, "0 = Correct22");
+        }
+
+        [TestMethod]
+        public void TestSpellCheckTextMixed()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA5 = new GingerAction();
+            string mixed = "Right rong nutright rIgHt comma,should, be ,right";
+
+            // Act            
+            spellCheckService.SpellCheckText(GA5, mixed);
+            int IncorrectGA5 = (from x in GA5.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectGA5 = (from x in GA5.Output.OutputValues where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            Assert.AreEqual(null, GA5.Errors, "Errors=null");
+            Assert.AreEqual(2, IncorrectGA5, "2 = IncorrectMixed");
             Assert.AreEqual(6, CorrectGA5, "6 = CorrectMixed");
+        }
+
+        [TestMethod]
+        public void TestSpellCheckTextFile()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA = new GingerAction();
+            string filename = TestResources.GetTestResourcesFile("TestTextFile.txt");
+
+            // Act            
+            spellCheckService.SpellCheckTextFile(GA, filename);
+            int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+            int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            Assert.AreEqual(null, GA.Errors, "Errors=null");
+            Assert.AreEqual(0, IncorrectLine1, "0 = IncorrectLine1");
+            Assert.AreEqual(4, CorrectLine1, "4 = CorrectLine1");
+            Assert.AreEqual(4, IncorrectLine5, "4 = IncorrectLine5");
+            Assert.AreEqual(0, CorrectLine5, "0 = CorrectLine5");
         }
     }
 }

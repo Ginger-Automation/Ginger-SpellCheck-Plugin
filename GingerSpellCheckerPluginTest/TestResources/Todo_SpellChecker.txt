@@ -2,7 +2,7 @@ spell check no
 
 level word sentence
 
-Fix if image not given
-	- Should i do this before calling boxes?
-	- Should i do it with a try catch?
+Add suggestion as list
+
+Add bitmap need help
 

@@ -36,6 +36,9 @@
     <None Update="TestResources\TestGreenBackg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestResources\TestTextFile.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestResources\TestWhite.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 namespace GingerSpellCheckerPlugin
 {
@@ -15,7 +14,7 @@ namespace GingerSpellCheckerPlugin
         {
             Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
             //In
-            // Check file exist if not set proper message in GA.Error and return
+            // Check if the file exist, if not set the proper message in GA.Error and return
             if (!File.Exists(fileName))
             {
                 GA.AddError("Could not find the file: '" + fileName + "'");
@@ -23,20 +22,20 @@ namespace GingerSpellCheckerPlugin
             }
 
             //Act
-            // Do spell check
+            // Do the spell check or catch error.
             BitmapScanner bitmapScanner = new BitmapScanner();
-            int incorrectCount;
+            int incorrectCount = 0;
+            List<TextBox> textBoxes = new List<TextBox>();
             try
             {
-                List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+                textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
             } catch (Exception ex)
             {
                 GA.AddError("Error while processing bitmap: " + ex.Message);
-            }
-            
+            }            
 
             //Out
-            // add ALL words, param is the word, path is the index, for each word found, value = OK/NOK(bad spell)
+            // Add all the words; param: word, path: position, value: Spelled In/Correctly.
             if (textBoxes.Count == 0)
             {
                 GA.AddExInfo("Could not find any text");
@@ -59,7 +58,7 @@ namespace GingerSpellCheckerPlugin
         }
 
         [GingerAction("SpellCheckText", "Spell check a text")]
-        public void SpellCheckText(IGingerAction GA, string text)
+        public void SpellCheckText(IGingerAction GA, string text, string line = "", int totalIncorrect = 0, int totalCorrect = 0)
         {
             Console.WriteLine(DateTime.Now + "> Text: " + text);
             //In
@@ -94,10 +93,51 @@ namespace GingerSpellCheckerPlugin
                 {
                     correct++;
                 }
-                GA.AddOutput(text, spelling, "");
+                GA.AddOutput(word, spelling, line);
             }
-            GA.AddOutput("Incorrect", incorrect, "");
-            GA.AddOutput("Correct", correct, "");
+            totalIncorrect = incorrect;
+            totalCorrect = correct;
+            GA.AddOutput("Incorrect", incorrect, line);
+            GA.AddOutput("Correct", correct, line);
+        }
+
+        [GingerAction("SpellCheckTextFile", "Spell check all the words in a text file")]
+        public void SpellCheckTextFile(IGingerAction GA, string fileName)
+        {
+            Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
+            //In
+            //get all the words from the text file
+            string[] lines = { };
+            try
+            {
+                lines = File.ReadAllLines(fileName);
+            } catch (Exception ex)
+            {
+                GA.AddError("Error while converting text file to text: " + ex.Message);
+                return;
+            }
+
+            //Act and Out
+            //loop over lines and run spellcheck if there was text found
+            if (lines.Length == 0)
+            {
+                GA.AddError("There is no text found in the file: '" + fileName + "'.");
+                return;
+            }
+            int lineNumber = 1;
+            int totalIncorrect = 0;
+            int totalCorrect = 0;
+            int lineIncorrect = 0;
+            int lineCorrect = 0;
+            foreach (string line in lines)
+            {
+                string lineNumberString = "Line: " + lineNumber.ToString();
+                SpellCheckText(GA, line, lineNumberString, lineIncorrect, lineCorrect);
+                totalIncorrect += lineIncorrect;
+                totalCorrect += lineCorrect;
+            }
+            GA.AddOutput("Total Incorrect", totalIncorrect, "");
+            GA.AddOutput("Total Correct", totalCorrect, "");
         }
 
         [GingerAction("SpellCheckReturnImage", "Spell check an Image and get an Image with marks on the mispelling")]
