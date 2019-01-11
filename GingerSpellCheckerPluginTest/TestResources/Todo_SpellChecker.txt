@@ -3,6 +3,3 @@ spell check no
 level word sentence
 
 Add suggestion as list
-
-Add bitmap need help
-

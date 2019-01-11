@@ -220,12 +220,12 @@ namespace GingerSpellCheckerPluginTest
             GingerAction GA = new GingerAction();
             string filename = TestResources.GetTestResourcesFile("TestTextFile.txt");
 
-            // Act            
+            // Act    
             spellCheckService.SpellCheckTextFile(GA, filename);
-            int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
-            int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
-            int CorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+            int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+            int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            int CorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line 5" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
 
             // Assert
             Assert.AreEqual(null, GA.Errors, "Errors=null");
@@ -233,6 +233,31 @@ namespace GingerSpellCheckerPluginTest
             Assert.AreEqual(4, CorrectLine1, "4 = CorrectLine1");
             Assert.AreEqual(4, IncorrectLine5, "4 = IncorrectLine5");
             Assert.AreEqual(0, CorrectLine5, "0 = CorrectLine5");
+        }
+
+        [TestMethod]
+        public void SpellCheckImage2()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA = new GingerAction();
+            string filename = TestResources.GetTestResourcesFile("BigBog.png");
+            string filename2 = TestResources.GetTestResourcesFile("TestGreenBackg.png");
+
+            // Act            
+            spellCheckService.SpellCheckImage2(GA, filename);
+            spellCheckService.SpellCheckImage2(GA, filename2);
+            //int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            //int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+            //int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
+            //int CorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
+
+            // Assert
+            //Assert.AreEqual(null, GA.Errors, "Errors=null");
+            //Assert.AreEqual(0, IncorrectLine1, "0 = IncorrectLine1");
+            //Assert.AreEqual(4, CorrectLine1, "4 = CorrectLine1");
+            //Assert.AreEqual(4, IncorrectLine5, "4 = IncorrectLine5");
+            //Assert.AreEqual(0, CorrectLine5, "0 = CorrectLine5");
         }
     }
 }
