@@ -19,7 +19,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = TestResources.GetTestResourcesFile("BigBog.png");
 
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
 
             // Assert
             Assert.AreEqual(null, GA.Errors, "Errors=null");
@@ -38,7 +38,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = "igBog.png";
 
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
 
             // Assert
             Assert.AreEqual("Could not find the file: '" + filename+ "'", GA.Errors, 
@@ -54,7 +54,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = TestResources.GetTestResourcesFile("TestWhite.png");
 
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
 
             // Assert
             Assert.AreEqual("Could not find any text", GA.ExInfo, "Could not find any text = GA.Errors");
@@ -75,7 +75,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = TestResources.GetTestResourcesFile(fileName);
             
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
 
             // Assert
             Assert.AreEqual(null, GA.Errors, "Errors=null");
@@ -94,7 +94,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = TestResources.GetTestResourcesFile("Todo_SpellChecker.txt");
 
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
 
             // Assert
             Assert.AreNotEqual(null, GA.Errors, "null != GA.Errors");
@@ -109,7 +109,7 @@ namespace GingerSpellCheckerPluginTest
             string filename = TestResources.GetTestResourcesFile("TestGreenBackg.png");
 
             // Act
-            spellCheckService.SpellCheckWord(GA, filename);
+            spellCheckService.SpellCheckBitmap(GA, filename);
             int Incorrect = (from x in GA.Output.OutputValues where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
 
             // Assert
@@ -245,8 +245,8 @@ namespace GingerSpellCheckerPluginTest
             string filename2 = TestResources.GetTestResourcesFile("TestGreenBackg.png");
 
             // Act            
-            spellCheckService.SpellCheckImage2(GA, filename);
-            spellCheckService.SpellCheckImage2(GA, filename2);
+            spellCheckService.SpellCheckAndReturnBitmap(GA, filename);
+            spellCheckService.SpellCheckAndReturnBitmap(GA, filename2);
             //int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
             //int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
             //int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();

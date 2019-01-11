@@ -9,8 +9,9 @@ namespace GingerSpellCheckerPlugin
     [GingerService("SpellCheckService", "Spell Check service")]
     public class SpellCheckService
     {
+
         [GingerAction("SpellCheckBitmap", "Spell check a bitmap")]
-        public void SpellCheckWord(IGingerAction GA, string fileName)
+        public void SpellCheckBitmap(IGingerAction GA, string fileName)
         {
             Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
             //In
@@ -57,6 +58,112 @@ namespace GingerSpellCheckerPlugin
             }
         }
 
+        [GingerAction("SpellCheckAndReturnBitmap", "Spell check an Image and get an Image with marks on the mispelling")]
+        public void SpellCheckAndReturnBitmap(IGingerAction GA, string fileName) // ?Shoham Question? Is there a better name for this functions?
+        {
+            Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
+            //In
+            // Check file exist if not set proper message in GA.Error and return
+            if (!File.Exists(fileName))
+            {
+                GA.AddError("Could not find the file: '" + fileName + "'");
+                return;
+            }
+
+            //Act
+            // Do spell check
+            BitmapScanner bitmapScanner = new BitmapScanner();
+            int incorrectCount;
+            List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
+
+            // Create the Image with markers
+            Bitmap bitmap = new Bitmap(fileName); //copy
+            int alpha = 128; //0-255
+            int red = 255; //0-255
+            int green = 40; //0-255
+            int blue = 150; //0-255
+            Brush pink = new SolidBrush(Color.FromArgb(alpha, red, green, blue));
+            foreach (TextBox text in textBoxes)
+            {
+                if (!text.isCorrectSpelling) // ?Shoham Question? Should I also add other stuff to GA?
+                {
+                    using (Graphics g = Graphics.FromImage(bitmap))
+                    {
+                        g.FillRectangle(pink, text.xPosition, text.yPosition, text.width, text.height); // ?Shoham Question? How do I add this to GA now?
+                    }
+                }
+            }
+            bitmap.Save(@"C:\Temp\example" + fileName.Length + ".bmp");
+
+        }
+
+        [GingerAction("SpellCheckBimapFolder", "Spell check all the bitmaps in a folder")]
+        public void SpellCheckFolder(IGingerAction GA, string folderName)
+        {
+            Console.WriteLine(DateTime.Now + "> Foldername: " + folderName);
+            //In
+            //get all the files in the folder
+            string[] files = Directory.GetFiles(folderName, "*ProfileHandler.cs", SearchOption.TopDirectoryOnly);
+
+            //Act and Out
+            //loop over files and run spellcheckword
+            if (files.Length == 0)
+            {
+                GA.AddError("There are no files in the folder: '" + folderName + "'.");
+                return;
+            }
+
+            //path: filename, param: IncorrectCount, TotalCount, value. 
+            BitmapScanner bitmapScanner = new BitmapScanner();
+            int incorrect;
+            int totalIncorrect = 0;
+            int words;
+            int totalWords = 0;
+            foreach (string file in files)
+            {
+                List<TextBox> textBoxes = bitmapScanner.getTextBoxes(file, true, out incorrect);
+                words = textBoxes.Capacity;
+                totalIncorrect += incorrect;
+                totalWords += words;
+                GA.AddOutput("Incorrect", incorrect, file);
+                GA.AddOutput("Words in file", words, file);
+            }
+            GA.AddOutput("Total Incorrect", totalIncorrect, folderName); // ?Shoham Question? Do you need these?
+            GA.AddOutput("Total Words", totalWords, folderName);
+        }
+
+        public void SpellCheckTextHelper(string text, out int numberIncorrect, out int numberCorrect)
+        {
+            //In
+            numberIncorrect = 0;
+            numberCorrect = 0;
+
+            //Act
+            //Do Spell Check
+            SpellCheck spellChecker = new SpellCheck();
+            string sugg = "";
+            char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' }; // ?Shoham Question? Is there a better way to do this?
+            string[] words = text.ToLower().Split(seperators);
+
+            //Out
+            // Add if correct or not and the suggestion
+            foreach (string word in words)
+            {
+                if (word == "")
+                {
+                    continue; // ?Shoham Question? Also is there a better way to do this?
+                }
+                if (!spellChecker.Check(word, out sugg))
+                {
+                    numberIncorrect++;
+                }
+                else
+                {
+                    numberCorrect++;
+                }
+            }
+        }
+
         [GingerAction("SpellCheckText", "Spell check a text")]
         public void SpellCheckText(IGingerAction GA, string text)
         {
@@ -72,7 +179,7 @@ namespace GingerSpellCheckerPlugin
             //Do Spell Check
             SpellCheck spellChecker = new SpellCheck();
             string sugg = "";
-            char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' }; //Is there a better way to do this?
+            char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' }; // ?Shoham Question? This is the same as last one?
             string[] words = text.ToLower().Split(seperators);
             int incorrect = 0;
             int correct = 0;
@@ -95,44 +202,10 @@ namespace GingerSpellCheckerPlugin
                 }
                 GA.AddOutput(word, spelling, "");
             }
-            GA.AddOutput("Incorrect", incorrect, "");
+            GA.AddOutput("Incorrect", incorrect, ""); // Should I add a path?
             GA.AddOutput("Correct", correct, "");
-        }
-
-        public void SpellCheckTextHelper(string text, out int numberIncorrect, out int numberCorrect)
-        {
-            Console.WriteLine(DateTime.Now + "> Text: " + text);
-            //In
-            numberIncorrect = 0;
-            numberCorrect = 0;
-
-            //Act
-            //Do Spell Check
-            SpellCheck spellChecker = new SpellCheck();
-            string sugg = "";
-            char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' }; //Is there a better way to do this?
-            string[] words = text.ToLower().Split(seperators);
-
-            //Out
-            // Add if correct or not and the suggestion
-            foreach (string word in words)
-            {
-                if (word == "")
-                {
-                    continue; // Also is there a better way to do this?
-                }
-                string spelling = "Correct Spelling.";
-                if (!spellChecker.Check(word, out sugg))
-                {
-                    spelling = "Incorrect Spelling. Suggestion: " + sugg;
-                    numberIncorrect++;
-                }
-                else
-                {
-                    numberCorrect++;
-                }
-            }
-        }
+            GA.AddOutput("Total", correct + incorrect, "");
+        }      
 
         [GingerAction("SpellCheckTextFile", "Spell check all the words in a text file")]
         public void SpellCheckTextFile(IGingerAction GA, string fileName)
@@ -172,70 +245,9 @@ namespace GingerSpellCheckerPlugin
                 GA.AddOutput("Correct", lineCorrect, lineNumberString);
                 lineNumber++;
             }
-            GA.AddOutput("Total Incorrect", totalIncorrect, "");
+            GA.AddOutput("Total Incorrect", totalIncorrect, ""); // ?Shoham Question? Do you need these?
             GA.AddOutput("Total Correct", totalCorrect, "");
-        }
-
-        [GingerAction("SpellCheckReturnImage", "Spell check an Image and get an Image with marks on the mispelling")]
-        public void SpellCheckImage2 (IGingerAction GA, string fileName)
-        {
-            Console.WriteLine(DateTime.Now + "> Filename: " + fileName);
-            //In
-            // Check file exist if not set proper message in GA.Error and return
-            if (!File.Exists(fileName))
-            {
-                GA.AddError("Could not find the file: '" + fileName + "'");
-                return;
-            }
-
-            //Act
-            // Do spell check
-            BitmapScanner bitmapScanner = new BitmapScanner();
-            int incorrectCount;
-            List<TextBox> textBoxes = bitmapScanner.getTextBoxes(fileName, true, out incorrectCount);
-
-            // Create the Image with markers
-            Bitmap bitmap = new Bitmap(fileName);
-            int alpha = 128; //0-255
-            int red = 255; //0-255
-            int green = 40; //0-255
-            int blue = 150; //0-255
-            Brush pink = new SolidBrush(Color.FromArgb(alpha, red, green, blue));
-            foreach (TextBox text in textBoxes)
-            {
-                if (!text.isCorrectSpelling)
-                {
-                    using (Graphics g = Graphics.FromImage(bitmap))
-                    {
-                        g.FillRectangle(pink, text.xPosition, text.yPosition, text.width, text.height);
-                    }
-                }                
-            }
-            bitmap.Save(@"C:\Temp\example" + fileName.Length + ".bmp");
-            
-        }
-
-        [GingerAction("SpellCheckFolder", "Spell check all the images in a folder")]
-        public void SpellCheckFolder(IGingerAction GA, string folderName)
-        {
-            Console.WriteLine(DateTime.Now + "> Filename: " + folderName);
-            //In
-            //get all the files in the folder
-            string[] files = Directory.GetFiles(folderName, "*ProfileHandler.cs", SearchOption.TopDirectoryOnly);
-
-            //Act and Out
-            //loop over files and run spellcheckword
-            if (files.Length == 0)
-            {
-                GA.AddError("There are no files in the folder: '" + folderName + "'.");
-                return;
-            }
-
-            //path filenam, param #incorrect, #total, value. 
-            foreach (string file in files)
-            {
-                SpellCheckWord(GA, file);
-            }
+            GA.AddOutput("Total Words", totalCorrect + totalIncorrect, "");
         }
     }
 }
