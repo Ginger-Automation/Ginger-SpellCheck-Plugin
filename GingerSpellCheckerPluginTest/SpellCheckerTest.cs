@@ -3,6 +3,7 @@ using GingerSpellCheckerPlugin;
 using GingerTestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace GingerSpellCheckerPluginTest
@@ -27,6 +28,25 @@ namespace GingerSpellCheckerPluginTest
             Assert.AreEqual("BIG", GA.Output.OutputValues[4].Param, "BIG = GA.Output.OutputValues[4].Param");
             Assert.AreEqual("Test", GA.Output.OutputValues[5].Param, "Test = GA.Output.OutputValues[5].Param");
             Assert.AreEqual("BOG", GA.Output.OutputValues[6].Param, "BOG = GA.Output.OutputValues[6].Param");
+        }
+
+        [TestMethod]
+        public void TestFolderScan()
+        {
+            //Arrange
+            SpellCheckService spellCheckService = new SpellCheckService();
+            GingerAction GA = new GingerAction();
+            string folder = TestResources.GetTestResourcesFolder("pics");
+
+            // Act
+            spellCheckService.SpellCheckFolder(GA, folder);
+
+            // Assert
+            Assert.AreEqual(null, GA.Errors, "Errors=null");
+            //Assert.AreEqual("Test", GA.Output.OutputValues[3].Param, "Test = GA.Output.OutputValues[3].Param");
+            //Assert.AreEqual("BIG", GA.Output.OutputValues[4].Param, "BIG = GA.Output.OutputValues[4].Param");
+            //Assert.AreEqual("Test", GA.Output.OutputValues[5].Param, "Test = GA.Output.OutputValues[5].Param");
+            //Assert.AreEqual("BOG", GA.Output.OutputValues[6].Param, "BOG = GA.Output.OutputValues[6].Param");
         }
 
         [TestMethod]
@@ -151,8 +171,8 @@ namespace GingerSpellCheckerPluginTest
 
             // Assert
             Assert.AreEqual(null, GA2.Errors, "Errors=null");
-            Assert.AreEqual(0, IncorrectGA2, "0 = Incorrect2");
-            Assert.AreEqual(6, CorrectGA2, "6 = Correct2");
+            Assert.AreEqual(5, IncorrectGA2, "5 = Incorrect2");
+            Assert.AreEqual(1, CorrectGA2, "1 = Correct2");
         }
 
         [TestMethod]
@@ -208,8 +228,8 @@ namespace GingerSpellCheckerPluginTest
 
             // Assert
             Assert.AreEqual(null, GA5.Errors, "Errors=null");
-            Assert.AreEqual(2, IncorrectGA5, "2 = IncorrectMixed");
-            Assert.AreEqual(6, CorrectGA5, "6 = CorrectMixed");
+            Assert.AreEqual(5, IncorrectGA5, "5 = IncorrectMixed");
+            Assert.AreEqual(2, CorrectGA5, "2 = CorrectMixed");
         }
 
         [TestMethod]
@@ -236,17 +256,18 @@ namespace GingerSpellCheckerPluginTest
         }
 
         [TestMethod]
-        public void SpellCheckImage2()
+        public void SpellCheckImageHighlight()
         {
             //Arrange
+            string outFolder = TestResources.GetTempFolder("output");
             SpellCheckService spellCheckService = new SpellCheckService();
             GingerAction GA = new GingerAction();
             string filename = TestResources.GetTestResourcesFile("BigBog.png");
-            string filename2 = TestResources.GetTestResourcesFile("TestGreenBackg.png");
+            // string filename2 = TestResources.GetTestResourcesFile("TestGreenBackg.png");
 
             // Act            
-            spellCheckService.SpellCheckAndReturnBitmap(GA, filename);
-            spellCheckService.SpellCheckAndReturnBitmap(GA, filename2);
+            spellCheckService.SpellCheckBitmapAndHighlightMisspelling(GA, filename, outFolder);
+            // spellCheckService.SpellCheckBitmapAndHighlightMisspelling(GA, filename2, TestResources.GetTempFolder("output"));
             //int IncorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
             //int CorrectLine1 = (from x in GA.Output.OutputValues where x.Path == "Line: 1" where x.Param == "Correct" select (int)x.Value).SingleOrDefault();
             //int IncorrectLine5 = (from x in GA.Output.OutputValues where x.Path == "Line: 5" where x.Param == "Incorrect" select (int)x.Value).SingleOrDefault();
@@ -258,6 +279,8 @@ namespace GingerSpellCheckerPluginTest
             //Assert.AreEqual(4, CorrectLine1, "4 = CorrectLine1");
             //Assert.AreEqual(4, IncorrectLine5, "4 = IncorrectLine5");
             //Assert.AreEqual(0, CorrectLine5, "0 = CorrectLine5");
+            string fileName = Path.Combine(outFolder, "BigBog.png");
+            Assert.IsTrue(System.IO.File.Exists(fileName));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace GingerSpellCheckerPlugin
 {
-    internal class TextBox
+    public class TextBox
     {
         public string text { get; set; }
         public int xPosition { get; set; }

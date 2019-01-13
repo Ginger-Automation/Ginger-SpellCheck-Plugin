@@ -4,7 +4,7 @@ using WeCantSpell.Hunspell;
 
 namespace GingerSpellCheckerPlugin
 {
-    internal class SpellCheck
+    public class SpellCheck
     {
 
         static WordList dictionairy;
@@ -17,18 +17,41 @@ namespace GingerSpellCheckerPlugin
             dictionairy = WordList.CreateFromFiles(binpath + @"/dictionairy/index.dic");
         }
 
-        internal bool Check(string curText, out string suggested)
+        public bool Check(string curText)
         {
-            bool correct = dictionairy.Check(curText);
-            if (!correct)
+            return dictionairy.Check(curText);
+        }
+
+        public List<string> Suggest(string curText)
+        {
+            return (List<string>)dictionairy.Suggest(curText);
+        }
+
+        public SpellCheckResult CheckLine(string line)
+        {
+            int numberIncorrect = 0;
+            int numberCorrect = 0;
+
+            //char[] seperators = { ' ', ',', ':', '(', ')', '"', '?' }; //TODO: Enable different seperators
+            string[] words = line.Split(" ");
+
+            foreach (string word in words)
             {
-                var vv = dictionairy.Suggest(curText);
-                var first = ((List<string>)dictionairy.Suggest(curText))[0];
-                suggested = first;
-                return false;
+                if (string.IsNullOrEmpty(word))
+                {
+                    continue;
+                }
+                if (Check(word))
+                {
+                    numberCorrect++;
+                }
+                else
+                {
+                    numberIncorrect++;
+                }
             }
-            suggested = "";
-            return true;
+            SpellCheckResult spellCheckResult = new SpellCheckResult(numberIncorrect, numberCorrect);
+            return spellCheckResult;
         }
     }
 }
